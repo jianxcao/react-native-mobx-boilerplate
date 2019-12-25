@@ -9,5 +9,7 @@
 import React from 'react';
 import router from '@/routers';
 import { createAppContainer } from 'react-navigation';
+import store from '@/store';
+console.log(11111, store);
 
 export default createAppContainer(router);

@@ -10,6 +10,7 @@ module.exports = api => {
           rootPathPrefix: '@/',
         },
       ],
+      ['@babel/plugin-proposal-decorators', { legacy: true }],
     ],
   };
 };
