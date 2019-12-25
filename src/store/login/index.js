@@ -2,7 +2,7 @@
 import { observable, action, computed } from 'mobx';
 import Module from '../utils/module';
 
-export default class Login extends Module {
+class Counter extends Module {
   @observable
   count = 0;
 
@@ -19,5 +19,19 @@ export default class Login extends Module {
   @computed
   get doubleCount() {
     return this.count * 2;
+  }
+}
+
+export default class Login extends Module {
+  constructor() {
+    super();
+    this.registerModule('counter', new Counter());
+  }
+  @observable
+  isLogin = false;
+
+  @action
+  changeLogin(isLogin = false) {
+    this.isLogin = isLogin;
   }
 }

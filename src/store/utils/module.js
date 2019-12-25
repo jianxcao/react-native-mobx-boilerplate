@@ -54,7 +54,6 @@ export default class Module {
     const name = types.slice(-1);
     types = types.slice(0, types.length - 1);
     let method;
-    console.log(types);
     // 调用子模块的action
     if (types.length > 0) {
       for (let i = 0; i < types.length; i++) {

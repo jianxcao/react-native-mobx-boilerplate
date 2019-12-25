@@ -9,7 +9,13 @@
 import React from 'react';
 import router from '@/routers';
 import { createAppContainer } from 'react-navigation';
-import store from '@/store';
-console.log(11111, store);
+import { Proiver } from '@/store';
 
-export default createAppContainer(router);
+export default function App() {
+  const Router = createAppContainer(router);
+  return (
+    <Proiver>
+      <Router />
+    </Proiver>
+  );
+}
