@@ -67,7 +67,7 @@ export default observer(Home);
 
 > store 中有 module 属性（可读属性）,所有子模块都在 module 属性中，通过层级挂接
 
-> 当前 sotre 的 dispatch 方法可以调用子组件的 action 如: `login.disaptch('counter/add')`是指调用 login 的 store 下的 counter 的 store 的 add 的 action
+> 当前 sotre 的 dispatch 方法可以调用子组件的 action 如: `login.disaptch('counter/add')`是指调用 login 下的 counter 的 add action
 
 > 如果想从跟组件调用可以是`login.dispatch('login/counter/add', {root: true})`，表示从跟组件查询
 
