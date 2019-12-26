@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button, StyleSheet, View, Text } from 'react-native';
-import AsyncStorage from '@/common/ls';
 import { connectStore } from '@/store';
 import { autorun } from 'mobx';
 @connectStore({
@@ -13,13 +12,18 @@ class Login extends React.Component {
   };
 
   componentDidMount() {
-    autorun(() => {
+    this.loginDisposer = autorun(() => {
       if (this.props.login.isLogin) {
         this.props.navigation.navigate('Home');
       }
     });
     if (this.props.login.isLogin) {
       this.props.navigation.navigate('Home');
+    }
+  }
+  componentWillUnmount() {
+    if (this.loginDisposer) {
+      this.loginDisposer();
     }
   }
 

@@ -35,3 +35,5 @@ export default class Login extends Module {
     this.isLogin = isLogin;
   }
 }
+
+window.Login = Login;

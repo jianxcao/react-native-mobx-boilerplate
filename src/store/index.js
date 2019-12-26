@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { observer } from 'mobx-react';
 import Module from './utils/module';
 import Login from './login';
 import Home from './home';
+import { autorun } from 'mobx';
 const modules = {
   login: new Login(),
   home: new Home(),
@@ -20,6 +21,18 @@ class Store extends Module {
 const store = new Store();
 window.store = store;
 
+// autorun(() => {
+//   console.log('root change', Object.keys(store.module));
+// });
+
+// autorun(() => {
+//   const types = 'login';
+//   const res = findModule(store, types);
+//   console.log(res);
+// });
+
+export default store;
+
 export const storesContext = React.createContext({ store });
 
 /**
@@ -29,30 +42,35 @@ export const storesContext = React.createContext({ store });
  * }
  */
 export const useStores = types => {
-  const store = React.useContext(storesContext);
-  const stores = {};
-  if (isPlainObject(types)) {
-    const keys = Object.keys(types);
-    keys.forEach(key => {
-      const one = findStoreHelper(types[key], store);
-      if (one) {
-        stores[key] = one;
-      }
-    });
-  } else {
-    const result = findStoreHelper(types, store);
-    stores.store = result;
-  }
-  return stores;
+  const res = React.useContext(storesContext);
+  return findModule(res.store, types);
 };
 
-export function Proiver(props) {
+export const Proiver = function(props) {
   return (
-    <storesContext.Provider value={store}>
+    <storesContext.Provider value={{ store }}>
       {props.children}
     </storesContext.Provider>
   );
+};
+
+function findModule(store, types) {
+  const res = {};
+  if (isPlainObject(types)) {
+    const keys = Object.keys(types);
+    keys.forEach(key => {
+      const one = store.findModule(types[key]);
+      if (one) {
+        res[key] = one;
+      }
+    });
+  } else {
+    const result = store.findModule(types);
+    res.store = result;
+  }
+  return res;
 }
+
 /**
  * 取出一个store，根据路径
  * @param {Compoents} target
@@ -63,31 +81,10 @@ export function connectStore(types, { forwardRef } = { forwardRef: true }) {
   return function connect(App) {
     App = observer(App);
     const Components = props => {
+      let stores = useStores(types);
+      console.log('in render');
       return (
-        <storesContext.Consumer>
-          {value => {
-            const stores = {};
-            if (isPlainObject(types)) {
-              const keys = Object.keys(types);
-              keys.forEach(key => {
-                const one = findStoreHelper(types[key], value);
-                if (one) {
-                  stores[key] = one;
-                }
-              });
-            } else {
-              const result = findStoreHelper(types, value);
-              stores.store = result;
-            }
-            return (
-              <App
-                {...props}
-                {...stores}
-                dispatch={store.dispatch.bind(store)}
-              />
-            );
-          }}
-        </storesContext.Consumer>
+        <App {...props} {...stores} dispatch={store.dispatch.bind(store)} />
       );
     };
     const displayName = `Connect(${App.displayName ||
@@ -109,27 +106,6 @@ export function connectStore(types, { forwardRef } = { forwardRef: true }) {
     return hoistStatics(Components, App);
   };
 }
-
-function findStoreHelper(types, store) {
-  if (!types) {
-    return store;
-  }
-  if (typeof types === 'string') {
-    types = types.split('/');
-    for (let i = 0; i < types.length; i++) {
-      const module = store.module;
-      if (module[types[i]]) {
-        store = module[types[i]];
-      } else {
-        return null;
-      }
-    }
-    return store;
-  }
-  return null;
-}
-
-export default store;
 
 /** Checks to see if a value is an object */
 export function isObject(value) {

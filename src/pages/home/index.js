@@ -13,11 +13,16 @@ class HomeScreen extends React.Component {
     header: null,
   };
   componentDidMount() {
-    autorun(() => {
+    this.loginDisposer = autorun(() => {
       if (!this.props.login.isLogin) {
         this.props.navigation.navigate('Login');
       }
     });
+  }
+  componentWillUnmount() {
+    if (this.loginDisposer) {
+      this.loginDisposer();
+    }
   }
   render() {
     return (

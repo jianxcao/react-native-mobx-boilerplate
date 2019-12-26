@@ -1,9 +1,19 @@
-import { actions } from 'mobx-react';
-const moduleSymbol = Symbol('symbol');
+import {
+  observable,
+  computed,
+  set,
+  get,
+  remove,
+  has,
+  action,
+  decorate,
+} from 'mobx';
+const moduleSymbol = Symbol('moduleSymbol');
 const parentSymbol = Symbol('parentSymbol');
+
 export default class Module {
-  constructor(params) {
-    this[moduleSymbol] = {};
+  constructor() {
+    this[moduleSymbol] = observable({});
   }
   get module() {
     return this[moduleSymbol];
@@ -21,28 +31,63 @@ export default class Module {
   get isRoot() {
     return this.parent === null;
   }
+  /**
+   * 查找一个模块，
+   * @param {*} type 模块名称 用/区分模块层级
+   * @param {*} isRoot
+   */
+  findModule(types, isRoot = false) {
+    if (!types) {
+      return this;
+    }
+    let store = this;
+    if (isRoot) {
+      store = store.root;
+    }
+    if (typeof types === 'string') {
+      types = types.split('/');
+      for (let i = 0; i < types.length; i++) {
+        const module = store.module;
+        if (module[types[i]]) {
+          store = module[types[i]];
+        } else {
+          return null;
+        }
+      }
+      return store;
+    }
+    return null;
+  }
   // 注册子模块
   registerModule(name, module) {
-    if (this[moduleSymbol][name]) {
+    if (!module instanceof Module) {
+      throw new Error('store must extends Module class');
+    }
+    if (has(this[moduleSymbol], name)) {
       return this;
     }
     if (module) {
-      this[moduleSymbol][name] = module;
+      set(this[moduleSymbol], { [name]: module });
       module[parentSymbol] = this;
     }
   }
+
   // 移除子模块
   removeModule(name) {
     if (this[moduleSymbol][name]) {
-      delete this[moduleSymbol][name];
+      remove(this[moduleSymbol], name);
     }
   }
   // 替换子模块
   replaceMdule(name, module) {
+    if (!module instanceof Module) {
+      throw new Error('store must extends Module class');
+    }
     if (module) {
-      this[moduleSymbol][name] = module;
+      set(this[moduleSymbol], { [name]: module });
       module[parentSymbol] = this;
     }
+    return this;
   }
   // 触发action
   dispatch(type, payload, { root } = { root: false }) {
@@ -74,3 +119,10 @@ export default class Module {
     return method.call(m, payload);
   }
 }
+decorate(Module, {
+  [moduleSymbol]: observable,
+  module: computed,
+  registerModule: action,
+  removeModule: action,
+  replaceMdule: action,
+});
