@@ -13,7 +13,6 @@ import { Proiver } from '@/store';
 
 export default function App() {
   const Router = createAppContainer(router);
-  console.log('in app');
   return (
     <Proiver>
       <Router />

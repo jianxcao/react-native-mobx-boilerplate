@@ -31,6 +31,7 @@ class HomeScreen extends React.Component {
         <View
           style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <Text>Home Screen</Text>
+          <Text>{this.props.counter.count}</Text>
           <Button title='logout' onPress={this.handleLogout} />
         </View>
       </>

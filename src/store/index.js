@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import hoistStatics from 'hoist-non-react-statics';
 import { observer } from 'mobx-react';
 import Module from './utils/module';
 import Login from './login';
 import Home from './home';
-import { autorun } from 'mobx';
+import { autorun, observable } from 'mobx';
 const modules = {
   login: new Login(),
   home: new Home(),
@@ -79,17 +79,16 @@ function findModule(store, types) {
  */
 export function connectStore(types, { forwardRef } = { forwardRef: true }) {
   return function connect(App) {
-    App = observer(App);
-    const Components = props => {
-      let stores = useStores(types);
-      console.log('in render');
-      return (
-        <App {...props} {...stores} dispatch={store.dispatch.bind(store)} />
-      );
-    };
     const displayName = `Connect(${App.displayName ||
       App.name ||
       'Component'})`;
+    App = observer(App);
+    const Components = observer(props => {
+      let stores = useStores(types);
+      return (
+        <App {...props} {...stores} dispatch={store.dispatch.bind(store)} />
+      );
+    });
     Components.displayName = displayName;
     if (forwardRef) {
       const forwarded = React.forwardRef(function forwardConnectRef(
