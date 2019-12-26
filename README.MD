@@ -69,7 +69,7 @@ export default observer(Home);
 
 > 当前 sotre 的 dispatch 方法可以调用子组件的 action 如: `login.disaptch('counter/add')`是指调用 login 下的 counter 的 add action
 
-> 如果想从跟组件调用可以是`login.dispatch('login/counter/add', {root: true})`，表示从跟组件查询
+> 如果想从根组件调用可以是`login.dispatch('login/counter/add', {root: true})`，表示从跟组件查询
 
 ### 为啥要有层级？？
 
