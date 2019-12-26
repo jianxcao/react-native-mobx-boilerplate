@@ -19,7 +19,7 @@ const modules = {
 > 如
 
 ```javascript
-// 这样会将login的store作为props注入到home组件中，mobx的observer已经自定注入无需关心
+// 这样会将login的store作为props注入到home组件中，mobx的observer已经自动注入无需关心
 // 会在props上有dispatch方法，为root节点的dispatch方法
 @connectStore({
   login: 'login',
@@ -39,7 +39,7 @@ class Home {
 	}
 }
 
-// 这样会注入一个props叫store，store指向 login，mobx的observer已经自定注入无需关心
+// 这样会注入一个props叫store，store指向 login，mobx的observer已经自动注入无需关心
 // 会在props上有dispatch方法，为root节点的dispatch方法
 @connectStore('login')
 class Home1 {
@@ -63,9 +63,12 @@ export default observer(Home);
 
 ### store 中 module 的说明
 
-> store 继承 module 后，会形成层级关系，并在 store 上会有 `dispatch`, `registerModule` `removeModule` `replaceMdule` 方法
+> store 继承 module 后，会形成层级关系，并在 store 上会有 `dispatch`, `registerModule` `removeModule` `replaceMdule` 方法。
+
 > store 中有 module 属性（可读属性）,所有子模块都在 module 属性中，通过层级挂接
+
 > 当前 sotre 的 dispatch 方法可以调用子组件的 action 如: `login.disaptch('counter/add')`是指调用 login 的 store 下的 counter 的 store 的 add 的 action
+
 > 如果想从跟组件调用可以是`login.dispatch('login/counter/add', {root: true})`，表示从跟组件查询
 
 ### 为啥要有层级？？
