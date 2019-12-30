@@ -4,7 +4,10 @@ import { observer } from 'mobx-react';
 import Module from './utils/module';
 import Login from './login';
 import Home from './home';
-import { spy } from 'mobx';
+import { spy, configure } from 'mobx';
+
+// configure({ enforceActions: 'observed' });
+
 const modules = {
   login: new Login(),
   home: new Home(),
@@ -30,12 +33,12 @@ window.store = store;
 //   const res = findModule(store, types);
 //   console.log(res);
 // });
-spy(event => {
-  if (event.type === 'action') {
-    console.log('event', event);
-    console.log(`${event.name} with args: ${event.arguments}`);
-  }
-});
+// spy(event => {
+//   if (event.type === 'action') {
+//     console.log('event', event);
+//     console.log(`${event.name} with args: ${event.arguments}`);
+//   }
+// });
 
 export default store;
 

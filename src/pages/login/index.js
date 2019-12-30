@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, StyleSheet, View, Text } from 'react-native';
 import { connectStore } from '@/store';
-import { autorun } from 'mobx';
+import { autorun, toJS, observable, action } from 'mobx';
 @connectStore({
   login: 'login',
   counter: 'login/counter',
@@ -10,7 +10,7 @@ class Login extends React.Component {
   static navigationOptions = {
     title: 'Please sign in',
   };
-
+  @observable test = 1;
   componentDidMount() {
     this.loginDisposer = autorun(() => {
       if (this.props.login.isLogin) {
@@ -28,18 +28,27 @@ class Login extends React.Component {
   }
 
   render() {
-    const { counter } = this.props;
+    const { counter, login } = this.props;
     return (
       <View style={styles.container}>
-        <Text>{counter.count}</Text>
-        <Button title='Sign in!' onPress={this._signInAsync} />
+        <Text>test:{this.test}</Text>
+        <Text>count:{counter.count}</Text>
+        <Text>obj:{JSON.stringify(toJS(login.obj))}</Text>
+        <Text>loading status:{JSON.stringify(toJS(login.loading))}</Text>
+        <Button title='Sign in!' onPress={this.handleSignIn} />
+        <Button title='change' onPress={this.changeObj} />
       </View>
     );
   }
 
-  _signInAsync = async () => {
+  handleSignIn = async () => {
     this.props.dispatch('login/changeLogin', true);
     this.props.navigation.navigate('Home');
+  };
+  changeObj = () => {
+    this.props.dispatch('login/changeObj', { b: 1 });
+    // this.test = 2;
+    // this.props.login.obj = { b: 1 };
   };
 }
 
