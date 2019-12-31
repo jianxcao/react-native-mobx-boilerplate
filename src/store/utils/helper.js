@@ -1,4 +1,11 @@
-import { extendObservable, observable, set, action, runInAction } from 'mobx';
+import {
+  observable,
+  set,
+  action,
+  runInAction,
+  extendObservable,
+  computed,
+} from 'mobx';
 
 /**
  * 注入loading的状态，替代 @action，这个方法会自动注入loading的state，
@@ -16,17 +23,27 @@ export function loadingAction(target, name, descriptor) {
   if (!value.isMobxAction) {
     value = action(value);
   }
+  //  原型上没有loading对象，则注入一个
   if (!target.loading) {
     target.loading = observable({});
-    target.modelLoading = observable.box(true);
   }
+  if (!target.modelLoading) {
+    const res = observable(target, 'modelLoading', {
+      writable: true,
+      enumerable: true,
+      configurable: true,
+      value: false,
+    });
+    Object.defineProperty(target, 'modelLoading', res);
+  }
+
   return {
     writable: true,
     configurable: true,
     enumerable: false,
     value: action(async function loadingRes(...arg) {
       set(this.loading, { [name]: true });
-      this.modelLoading.set(true);
+      this.modelLoading = true;
       try {
         const res = await value.apply(this, arg);
         return res;
@@ -35,7 +52,7 @@ export function loadingAction(target, name, descriptor) {
       } finally {
         runInAction(() => {
           set(this.loading, { [name]: false });
-          this.modelLoading.set(false);
+          this.modelLoading = false;
         });
       }
     }),

@@ -35,6 +35,9 @@ class Login extends React.Component {
         <Text>count:{counter.count}</Text>
         <Text>obj:{JSON.stringify(toJS(login.obj))}</Text>
         <Text>loading status:{JSON.stringify(toJS(login.loading))}</Text>
+        <Text>
+          model loading status:{login.modelLoading ? 'loading' : 'complete'}
+        </Text>
         <Button title='Sign in!' onPress={this.handleSignIn} />
         <Button title='change' onPress={this.changeObj} />
       </View>
