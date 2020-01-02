@@ -118,6 +118,33 @@ export default class Module {
     }
     return method.call(m, payload);
   }
+  getState() {
+    const $mobx = this.$mobx;
+    if ($mobx) {
+      const storeKeys = Object.keys($mobx.values);
+      const store = storeKeys.reduce((res, cur) => {
+        if (cur !== 'module') {
+          res[cur] = toJS(this[cur]);
+        } else {
+          const modules = this.module;
+          const moduleKeys = keys(modules);
+          if (moduleKeys.length) {
+            res.module = moduleKeys.reduce((result, key) => {
+              const val = modules[key].getState();
+              result[key] = val;
+              return result;
+            }, {});
+          }
+        }
+        return res;
+      }, {});
+      if (storeKeys.length === 1 && this.root) {
+        return store.module;
+      }
+      return store;
+    }
+    return null;
+  }
 }
 decorate(Module, {
   [moduleSymbol]: observable,
