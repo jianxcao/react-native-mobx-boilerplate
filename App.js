@@ -10,6 +10,7 @@ import React from 'react';
 import router from '@/routers';
 import { createAppContainer } from 'react-navigation';
 import { Proiver } from '@/store';
+import 'react-native-gesture-handler';
 
 export default function App() {
   const Router = createAppContainer(router);
