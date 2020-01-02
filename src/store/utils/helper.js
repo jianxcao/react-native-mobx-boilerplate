@@ -27,7 +27,7 @@ export function loadingAction(target, name, descriptor) {
   if (!target.loading) {
     target.loading = observable({});
   }
-  if (!target.modelLoading) {
+  if (!target.hasOwnProperty('modelLoading')) {
     const res = observable(target, 'modelLoading', {
       writable: true,
       enumerable: true,
