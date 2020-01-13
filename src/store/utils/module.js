@@ -7,6 +7,8 @@ import {
   has,
   action,
   decorate,
+  toJS,
+  keys,
 } from 'mobx';
 const moduleSymbol = Symbol('moduleSymbol');
 const parentSymbol = Symbol('parentSymbol');
@@ -14,6 +16,7 @@ const parentSymbol = Symbol('parentSymbol');
 export default class Module {
   constructor() {
     this[moduleSymbol] = observable({});
+    this[parentSymbol] = null;
   }
   get module() {
     return this[moduleSymbol];
@@ -48,7 +51,7 @@ export default class Module {
       types = types.split('/');
       for (let i = 0; i < types.length; i++) {
         const module = store.module;
-        if (module[types[i]]) {
+        if (module && module[types[i]]) {
           store = module[types[i]];
         } else {
           return null;
@@ -63,6 +66,7 @@ export default class Module {
     if (!module instanceof Module) {
       throw new Error('store must extends Module class');
     }
+    // console.log('in reg module', name, module, this);
     if (has(this[moduleSymbol], name)) {
       return this;
     }
@@ -127,13 +131,15 @@ export default class Module {
           res[cur] = toJS(this[cur]);
         } else {
           const modules = this.module;
-          const moduleKeys = keys(modules);
-          if (moduleKeys.length) {
-            res.module = moduleKeys.reduce((result, key) => {
-              const val = modules[key].getState();
-              result[key] = val;
-              return result;
-            }, {});
+          if (modules) {
+            const moduleKeys = keys(modules);
+            if (moduleKeys.length) {
+              res.module = moduleKeys.reduce((result, key) => {
+                const val = modules[key].getState();
+                result[key] = val;
+                return result;
+              }, {});
+            }
           }
         }
         return res;
@@ -153,3 +159,5 @@ decorate(Module, {
   removeModule: action,
   replaceMdule: action,
 });
+
+global.Module1 = Module;
