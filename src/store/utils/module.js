@@ -1,5 +1,6 @@
 import {
   observable,
+  extendObservable,
   computed,
   set,
   get,
@@ -10,14 +11,16 @@ import {
   toJS,
   keys,
 } from 'mobx';
-const moduleSymbol = Symbol('moduleSymbol');
-const parentSymbol = Symbol('parentSymbol');
 
-export default class Module {
+const moduleSymbol = '__moduleSymbol__';
+const parentSymbol = '__parentSymbol__';
+
+class Module {
   constructor() {
-    this[moduleSymbol] = observable({});
+    this[moduleSymbol] = {};
     this[parentSymbol] = null;
   }
+
   get module() {
     return this[moduleSymbol];
   }
@@ -152,12 +155,13 @@ export default class Module {
     return null;
   }
 }
+
 decorate(Module, {
   [moduleSymbol]: observable,
+  [parentSymbol]: observable.ref,
   module: computed,
   registerModule: action,
   removeModule: action,
   replaceMdule: action,
 });
-
-global.Module1 = Module;
+export default Module;
