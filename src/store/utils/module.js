@@ -69,7 +69,6 @@ class Module {
     if (!module instanceof Module) {
       throw new Error('store must extends Module class');
     }
-    // console.log('in reg module', name, module, this);
     if (has(this[moduleSymbol], name)) {
       return this;
     }
@@ -130,7 +129,7 @@ class Module {
     if ($mobx) {
       const storeKeys = Object.keys($mobx.values);
       const store = storeKeys.reduce((res, cur) => {
-        if (cur !== 'module') {
+        if (cur !== 'module' && !cur.startsWith('__')) {
           res[cur] = toJS(this[cur]);
         } else {
           const modules = this.module;
@@ -147,7 +146,7 @@ class Module {
         }
         return res;
       }, {});
-      if (storeKeys.length === 1 && this.root) {
+      if (this.root) {
         return store.module;
       }
       return store;
