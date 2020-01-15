@@ -128,28 +128,32 @@ class Module {
     const $mobx = this.$mobx;
     if ($mobx) {
       const storeKeys = Object.keys($mobx.values);
-      const store = storeKeys.reduce((res, cur) => {
-        if (cur !== 'module' && !cur.startsWith('__')) {
+      const result = storeKeys.reduce((res, cur) => {
+        if (cur.startsWith('__')) {
+          return res;
+        }
+        if (cur !== 'module') {
           res[cur] = toJS(this[cur]);
+          // console.log(cur, toJS(this[cur]));
         } else {
           const modules = this.module;
           if (modules) {
             const moduleKeys = keys(modules);
             if (moduleKeys.length) {
-              res.module = moduleKeys.reduce((result, key) => {
+              res.module = moduleKeys.reduce((model, key) => {
                 const val = modules[key].getState();
-                result[key] = val;
-                return result;
+                model[key] = val;
+                return model;
               }, {});
             }
           }
         }
         return res;
       }, {});
-      if (this.root) {
-        return store.module;
+      if (this.isRoot) {
+        return result.module;
       }
-      return store;
+      return result;
     }
     return null;
   }
